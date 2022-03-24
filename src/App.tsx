@@ -1,45 +1,40 @@
-import { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+import * as React from 'react';
+import styled from 'styled-components';
 
-function App() {
-  const [count, setCount] = useState(0)
+import { Game } from './components';
+import { useAPI } from './hooks';
+import { initialTiles } from './utils';
+
+export const AppContainer = styled.section`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  > * {
+    max-width: 60rem;
+    margin: 10rem;
+  }
+`;
+
+export default function App() {
+  const [tiles, setTiles] = React.useState(initialTiles);
+  const [inProgress, setInProgress] = React.useState(false);
+  const { bet, reveal, cashoutAvailable, cashout } = useAPI({
+    tiles,
+    setTiles,
+    inProgress,
+    setInProgress
+  });
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
-    </div>
-  )
+    <AppContainer>
+      <Game
+        tiles={tiles}
+        inProgress={inProgress}
+        onBet={() => bet.run()}
+        onClickTile={(_, position) => reveal.run(position)}
+        cashoutAvailable={cashoutAvailable}
+        onCashout={() => cashout.run()}
+      />
+    </AppContainer>
+  );
 }
-
-export default App
